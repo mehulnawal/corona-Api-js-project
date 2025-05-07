@@ -1,23 +1,8 @@
 /*
-section 1 ✔
-https://disease.sh/v3/covid-19/all
-Total cases - 
-todayCases - 
-
-Total Deaths - 
-todayDeaths - 
-
-Total recovered - 
-Recovery rate - 
-
-Total active cases - 
-Active rate- 
-
-section 2 ✔
-https://disease.sh/v3/covid-19/countries
-
-section 3
-table view and card view toggle
+correct chart js data ✔
+sorting
+correct cards background color on theme change
+toggle view correctly ✔
 */
 
 // current date
@@ -61,10 +46,25 @@ let globalData = async () => {
 };
 globalData();
 
+let countryID = 0;
+let countryDataArray = [];
 
 let tbody = document.getElementById("tbody");
 let row = "";
+
+
+// toggle view data and table
+let tableIcon = document.getElementById("tableIcon")
+let tableContent = document.getElementById("tableContent")
+let tableViewHtml = document.getElementById("tableView")
+
+let cardIcon = document.getElementById("cardIcon")
+let cardContent = document.getElementById("cardContent")
+let cardView = document.getElementById("cardView");
+
 const tableView = async () => {
+    countryDataArray = [];
+    tbody.innerHTML = "";
     let response = await fetch("https://disease.sh/v3/covid-19/countries");
     let data = await response.json();
 
@@ -83,11 +83,30 @@ const tableView = async () => {
                     <td>${value.active}</td>
                     <td>${value.critical}</td>`;
         tbody.appendChild(row);
+
+        let countryData = {
+            "id": countryID,
+            "flag": value.countryInfo["flag"],
+            "country name": value.country,
+            "Total cases": value.cases,
+            "Today cases": value.todayCases,
+            "Total Deaths": value.deaths,
+            "Today Deaths": value.todayDeaths,
+            "Recovered": value.recovered,
+            "Active": value.active,
+            "Critical": value.critical,
+        };
+
+        countryDataArray.push(countryData);
+
+        countryID++;
     });
+    localStorage.setItem("CountryData", JSON.stringify(countryDataArray));
 };
 // tableView();
 
 const cardData = async () => {
+    cardView.innerHTML = "";
     let response = await fetch("https://disease.sh/v3/covid-19/countries");
     let data = await response.json();
 
@@ -131,32 +150,20 @@ const cardData = async () => {
     });
 };
 
-
-// toggle view data and table
-let tableIcon = document.getElementById("tableIcon")
-let tableContent = document.getElementById("tableContent")
-let tableViewHtml = document.getElementById("tableView")
-
-let cardIcon = document.getElementById("cardIcon")
-let cardContent = document.getElementById("cardContent")
-let cardView = document.getElementById("cardView");
-// let count = 0;
-
-localStorage.setItem("CurrentView", "table");
+// localStorage.setItem("CurrentView", "table");
 
 cardContent.addEventListener("click", function () {
 
     cardIcon.style.display = "none";
     cardView.style.display = "none";
     cardContent.style.display = "none";
-    // cardView.innerHTML = "";
 
     tableViewHtml.style.display = "block";
     tableIcon.style.display = "block";
     tableContent.style.display = "block";
 
-    localStorage.setItem("CurrentView", "card");
-    cardData();
+    localStorage.setItem("CurrentView", "table");
+    tableView();
 
 });
 
@@ -171,36 +178,42 @@ tableContent.addEventListener("click", function () {
     tableIcon.style.display = "none";
     tableContent.style.display = "none";
 
-    localStorage.setItem("CurrentView", "table");
-    tableView();
+    localStorage.setItem("CurrentView", "card");
+    cardData();
 
 });
 
-// saving country names in an array 
-let countryNameArray = [];
-let savingCountryNames = async () => {
-    let response = await fetch("https://disease.sh/v3/covid-19/countries");
-    let data = await response.json();
-
-    data.forEach((value) => {
-        countryNameArray.push(value.country);
-    });
-};
-savingCountryNames();
-// console.log(countryNameArray);
 
 // searching by country name
 let searchInput = document.getElementById("searchInput");
+
 searchInput.addEventListener("input", function () {
     let searchName = searchInput.value.toLowerCase();
-    let a = countryNameArray.indexOf(searchName);
 
-    if (a > -1) {
-        console.log(true);
-    }
-    else {
-        console.log(false);
-    }
+    let get = JSON.parse(localStorage.getItem("CountryData"))
+
+    tbody.innerHTML = "";
+
+    get.filter((value, index, array) => {
+        if (value["country name"].toLowerCase().includes(searchName)) {
+
+            row = document.createElement("tr");
+            row.innerHTML = `
+                        <td class="d-flex align-items-center gap-2">
+                        <img src="${value.flag}" alt="" id="countryFlag">    
+                        <div>${value["country name"]}</div>
+                        </td>
+                        <td>${value["Total cases"]}</td>
+                        <td>${value["Today cases"]}</td>
+                        <td>${value["Total Deaths"]}</td>
+                        <td>${value["Today Deaths"]}</td>
+                        <td>${value["Recovered"]}</ >
+                        <td>${value["Active"]}</td>
+                        <td>${value["Critical"]}</td>`;
+            tbody.appendChild(row);
+
+        }
+    });
 });
 
 // On load - set default view
@@ -208,8 +221,26 @@ function getCurrentView() {
     let view = localStorage.getItem("CurrentView");
 
     if (view === "card") {
+
         cardData();
-    } else {
+
+        cardIcon.style.display = "block";
+        cardContent.style.display = "block";
+        cardView.style.display = "flex";
+
+        tableViewHtml.style.display = "none";
+        tableIcon.style.display = "none";
+        tableContent.style.display = "none";
+    }
+    else if (view === "table") {
+        cardIcon.style.display = "none";
+        cardView.style.display = "none";
+        cardContent.style.display = "none";
+
+        tableViewHtml.style.display = "block";
+        tableIcon.style.display = "block";
+        tableContent.style.display = "block";
+
         tableView();
     }
 }
@@ -249,6 +280,8 @@ darkThemeIcon.addEventListener("click", function () {
     cardView.style.backgroundColor = "#000";
     cardView.style.color = "#fff";
 
+    searchInput.style.color = "#fff";
+
     card.forEach((value) => {
         value.style.backgroundColor = "#000";
         value.style.color = "#fff";
@@ -281,6 +314,8 @@ lightThemeIcon.addEventListener("click", function () {
 
     cardView.style.backgroundColor = "#fff";
     cardView.style.color = "#000";
+
+    searchInput.style.color = "#000";
 
     dataVisualization.style.color = "#000";
 
@@ -323,6 +358,8 @@ function loadThemeOnReload() {
         table.style.backgroundColor = "#000";
         table.style.color = "#fff";
 
+        searchInput.style.color = "#fff";
+
         cardView.style.backgroundColor = "#000";
         cardView.style.color = "#fff";
 
@@ -355,6 +392,8 @@ function loadThemeOnReload() {
         table.style.backgroundColor = "#fff";
         table.style.color = "#000";
 
+        searchInput.style.color = "#000";
+
         cardView.style.backgroundColor = "#fff";
         cardView.style.color = "#000";
 
@@ -378,3 +417,33 @@ function loadThemeOnReload() {
 };
 
 loadThemeOnReload();
+
+
+// sorting
+let sortCountry = document.getElementById("sortCountry");
+
+sortCountry.addEventListener("change", function () {
+    let sortValue = sortCountry.value;
+    let get = JSON.parse(localStorage.getItem("CountryData"));
+
+    get.filter((value, index, array) => {
+        console.log(value);
+    });
+
+    if (sortValue == "sortByCases") {
+        console.log("sortByCases");
+    }
+    else if (sortValue == "sortByDeaths") {
+        console.log("sortByDeaths");
+    }
+    else if (sortValue == "sortByRecovered") {
+        console.log("sortByRecovered");
+    }
+    else if (sortValue == "sortByActive") {
+        console.log("sortByActive");
+    }
+    else if (sortValue == "selectOption") {
+        console.log("selectOption");
+    }
+});
+
