@@ -1,0 +1,295 @@
+body {
+    background-color: #F3F4F6;
+    overflow-x: hidden;
+}
+
+/* navbar */
+#navbar {
+    /* background-color: rgba(59, 130, 246, 0.5); */
+    background-color: #2563EB;
+    color: #fff;
+    padding: 30px 20px;
+
+    #navLeft {
+        h4 {
+            font-weight: 600;
+        }
+
+        .currentDate {
+            margin-top: 30px;
+        }
+    }
+
+    .navRight {
+        i {
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        #lightThemeIcon {
+            display: none;
+        }
+    }
+}
+
+/* Global Statistics */
+#global {
+    padding: 0px 30px;
+    margin-top: 30px;
+
+    #title {
+        font-weight: 700;
+        font-size: 20px;
+    }
+
+    .globalBox {
+        transition: transform 0.3s;
+        box-shadow: 0px 4px 20px rgba(107, 114, 128, 0.3);
+        height: 120px;
+        background-color: #fff;
+
+        .title {
+            /* color: #6b7280; */
+            font-size: 15px;
+            font-weight: normal;
+            margin: 0px;
+        }
+
+        .thirdHeading {
+            font-weight: 500;
+        }
+
+        .icon {
+            background-color: #DBEAFE;
+            padding: 10px 10px;
+            border-radius: 50%;
+        }
+    }
+
+    .globalBox:hover {
+        transform: translateY(-5px);
+    }
+
+    #today {
+        border-left: 4px solid #2563EB;
+    }
+
+    #todayCases,
+    #totalCasesIcon {
+        color: #2563EB;
+    }
+
+    #deaths {
+        border-left: 4px solid #EF4444;
+    }
+
+    #todayDeaths,
+    #totalDeathIcon {
+        color: #EF4444;
+    }
+
+    #totalDeathIcon {
+        background-color: #FEE2E2;
+    }
+
+    #recovered {
+        border-left: 4px solid #10B981;
+    }
+
+    #todayDeaths,
+    #totalDeathIcon {
+        color: #EF4444;
+    }
+
+    #totalDeathIcon {
+        background-color: #FEE2E2;
+    }
+
+    #todayRecovered,
+    #totalRecoveredIcon {
+        color: #10B981;
+    }
+
+    #totalRecoveredIcon {
+        background-color: #D1FAE5;
+    }
+
+    #active {
+        border-left: 4px solid #F59E0B;
+    }
+
+    #todayActive,
+    #totalActiveIcon {
+        color: #F59E0B;
+    }
+
+    #totalActiveIcon {
+        background-color: #FEF3C7;
+    }
+}
+
+/* countries */
+.countries {
+    padding: 0px 30px;
+    margin-top: 40px;
+
+    #countriesLeft {
+
+        #titleMain {
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        #searchBox {
+            border: 1px solid #000;
+            outline: none;
+            border-radius: 10px;
+            padding: 5px 10px;
+
+            #searchInput {
+                background-color: transparent;
+                border: none;
+                outline: none;
+            }
+        }
+    }
+
+    #countriesRight {
+        #sortCountry {
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
+
+        #view {
+            padding: 4px 10px;
+            background-color: #2563EB;
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+
+            #cardIcon,
+            #cardContent {
+                display: none;
+            }
+        }
+    }
+}
+
+/* table view */
+#tableView {
+    padding: 0px 30px;
+    margin-top: 40px;
+    overflow-x: scroll;
+    width: 100vw;
+
+    table {
+        background-color: #fff;
+        color: #000;
+        border-radius: 5px;
+        width: 100%;
+
+
+        td,
+        th {
+            padding: 5px 20px !important;
+            border-bottom: 1px solid rgba(107, 114, 128, 0.2);
+            margin-top: 4px;
+        }
+
+        th {
+            margin-top: 30px !important;
+            font-size: 12px !important;
+            padding: 6px 20px !important;
+        }
+
+        tr:hover:not(th) {
+            background-color: rgba(107, 114, 128, 0.1);
+        }
+
+        thead {
+            /* padding: 20px 40px; */
+
+            th {
+                text-transform: uppercase;
+                font-size: 12px;
+                color: rgba(107, 114, 128, 0.8);
+            }
+        }
+
+        #tbody {
+            /* padding: 20px 40px; */
+            /* background-color: #10B981; */
+
+            #countryFlag {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+            }
+
+        }
+    }
+}
+
+#cardView {
+    height: fit-content;
+    padding: 0px 30px;
+    /* transition: all 0.4s ease-in-out; */
+    background-color: #fff;
+    color: #000;
+    margin-top: 20px;
+
+    .card {
+        /* padding: 10px 0px; */
+        margin-top: 30px;
+        margin-bottom: 20px;
+        height: 200px;
+        background-color: #fff;
+        color: #000;
+
+        #title {
+            padding: 10px 20px;
+            border-bottom: 1px solid rgba(107, 114, 128, 0.8);
+
+            #logo {
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+            }
+
+            #countryName {
+                font-weight: 700;
+                font-size: 18px;
+            }
+        }
+
+        .cardCasesBox {
+            padding: 10px 25px;
+
+            h6 {
+                font-size: 13px;
+                color: rgba(107, 114, 128, 0.8);
+            }
+
+            div {
+                font-size: 14px;
+                margin: 0px;
+                padding: 0px;
+            }
+        }
+    }
+}
+
+#data-visualization {
+    padding: 20px 20px;
+
+    h6 {
+        color: #000;
+        font-size: 20px;
+    }
+
+    #distribution-chart {
+        width: fit-content !important;
+        max-width: 100%;
+        max-height: 300px !important;
+    }
+}

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Advanced Quiz App</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet" />
+    <style>
+        .screen {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .timer-bar {
+            transition: width 1s linear;
+        }
+
+        .option:hover {
+            background-color: #f3f4f6;
+        }
+
+        .correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+        }
+
+        .incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+        }
+
+        .selected {
+            border-color: #3b82f6 !important;
+            background-color: #eff6ff !important;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .pulse {
+            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 font-sans">
+    <!-- Start Screen -->
+    <div id="startScreen" class="screen active p-5">
+        <h2 class="text-2xl font-bold text-center mb-4">Welcome to the Advanced Quiz App!</h2>
+        <input id="playerName" type="text" class="w-full p-3 border rounded-lg mb-4" placeholder="Enter your name" />
+        <button id="startBtn" class="w-full p-3 bg-blue-500 text-white rounded-lg">Start Quiz</button>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="quizScreen" class="screen p-5">
+        <h2 class="text-xl mb-4" id="questionText"></h2>
+        <div id="optionsContainer" class="mb-4"></div>
+        <div class="flex justify-between">
+            <span>Question <span id="currentQuestionNumber">0</span> / <span id="totalQuestions">0</span></span>
+            <div class="flex items-center">
+                <span id="timerDisplay" class="mr-2">15</span>
+                <div id="timerBar" class="w-16 h-2 bg-green-500"></div>
+            </div>
+        </div>
+        <div class="mt-4 flex justify-between">
+            <button id="prevBtn" class="p-2 bg-gray-300 rounded-lg">Previous</button>
+            <button id="nextBtn" class="p-2 bg-blue-500 text-white rounded-lg">Next</button>
+        </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div id="resultsScreen" class="screen p-5">
+        <h2 class="text-2xl font-bold text-center mb-4">Results</h2>
+        <p>Name: <span id="playerNameResult"></span></p>
+        <p>Score: <span id="scoreValue">0</span></p>
+        <p>Total Time: <span id="timeTaken">0</span> seconds</p>
+        <p>Correct: <span id="correctCount">0</span></p>
+        <p>Incorrect: <span id="incorrectCount">0</span></p>
+        <p>Skipped: <span id="skippedCount">0</span></p>
+        <p>Avg Time per Question: <span id="avgTimePerQuestion">0</span> seconds</p>
+        <button id="reviewBtn" class="p-2 bg-yellow-500 text-white rounded-lg mt-4">Review Quiz</button>
+        <button id="homeBtn" class="p-2 bg-green-500 text-white rounded-lg mt-4">Go to Home</button>
+    </div>
+
+    <!-- Review Screen -->
+    <div id="reviewScreen" class="screen p-5">
+        <h2 class="text-xl font-bold mb-4">Review Your Quiz</h2>
+        <div id="reviewContainer"></div>
+        <button id="backToResultsBtn" class="p-2 bg-gray-300 rounded-lg mt-4">Back to Results</button>
+    </div>
+
+    <!-- Leaderboard Screen -->
+    <div id="leaderboardScreen" class="screen p-5">
+        <h2 class="text-2xl font-bold mb-4">Leaderboard</h2>
+        <table class="min-w-full">
+            <thead>
+                <tr>
+                    <th class="p-2">#</th>
+                    <th class="p-2">Name</th>
+                    <th class="p-2">Category</th>
+                    <th class="p-2">Score</th>
+                    <th class="p-2">Time</th>
+                    <th class="p-2">Date</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboardBody"></tbody>
+        </table>
+        <button id="backToHomeBtn" class="p-2 bg-gray-500 text-white rounded-lg mt-4">Back to Home</button>
+    </div>
+
+    <!-- Attempts Screen -->
+    <div id="attemptsScreen" class="screen p-5">
+        <h2 class="text-xl font-bold text-center mb-4">Your Previous Attempts</h2>
+        <button id="backFromAttemptsBtn" class="p-2 bg-gray-500 text-white rounded-lg">Back</button>
+    </div>
+
+
+    <!-- JavaScript Logic -->
+    <script>
+        const startBtn = document.getElementById('startBtn');
+        const homeBtn = document.getElementById('homeBtn');
+        const leaderboardBtn = document.getElementById('leaderboardBtn');
+        const reviewBtn = document.getElementById('reviewBtn');
+        const backToResultsBtn = document.getElementById('backToResultsBtn');
+        const backToHomeBtn = document.getElementById('backToHomeBtn');
+        const backFromAttemptsBtn = document.getElementById('backFromAttemptsBtn');
+        const retakeBtn = document.getElementById('retakeBtn');
+
+        const startScreen = document.getElementById('startScreen');
+        const quizScreen = document.getElementById('quizScreen');
+        const resultsScreen = document.getElementById('resultsScreen');
+        const reviewScreen = document.getElementById('reviewScreen');
+        const leaderboardScreen = document.getElementById('leaderboardScreen');
+        const attemptsScreen = document.getElementById('attemptsScreen');
+
+        const playerNameInput = document.getElementById('playerName');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const timerBar = document.getElementById('timerBar');
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const currentQuestionNumber = document.getElementById('currentQuestionNumber');
+        const totalQuestions = document.getElementById('totalQuestions');
+
+        const scoreValue = document.getElementById('scoreValue');
+        const totalQuestionsResult = document.getElementById('totalQuestionsResult');
+        const playerNameResult = document.getElementById('playerNameResult');
+        const timeTaken = document.getElementById('timeTaken');
+        const correctCount = document.getElementById('correctCount');
+        const incorrectCount = document.getElementById('incorrectCount');
+        const skippedCount = document.getElementById('skippedCount');
+        const avgTimePerQuestion = document.getElementById('avgTimePerQuestion');
+
+        const reviewContainer = document.getElementById('reviewContainer');
+        const leaderboardBody = document.getElementById('leaderboardBody');
+
+        let questions = [];
+        let currentIndex = 0;
+        let selectedAnswers = [];
+        let timer;
+        let timePerQuestion = 15;
+        let totalTime = 0;
+
+        const mockQuestions = [
+            {
+                question: "What is the capital of France?",
+                options: ["Berlin", "London", "Paris", "Madrid"],
+                answer: 2
+            },
+            {
+                question: "What does CPU stand for?",
+                options: ["Central Process Unit", "Central Processing Unit", "Computer Personal Unit", "Central Processor Unit"],
+                answer: 1
+            },
+            // Add more questions here
+        ];
+
+        function switchScreen(active) {
+            [startScreen, quizScreen, resultsScreen, reviewScreen, leaderboardScreen, attemptsScreen].forEach(screen => screen.classList.remove('active'));
+            active.classList.add('active');
+        }
+
+        function loadQuestion(index) {
+            const q = questions[index];
+            currentQuestionNumber.textContent = index + 1;
+            questionText.textContent = q.question;
+            optionsContainer.innerHTML = '';
+            q.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'option w-full p-3 border rounded-lg mb-2';
+                btn.textContent = opt;
+                btn.onclick = () => selectOption(i);
+                if (selectedAnswers[index] === i) btn.classList.add('selected');
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectOption(i) {
+            selectedAnswers[currentIndex] = i;
+            loadQuestion(currentIndex);
+        }
+
+        function startTimer() {
+            let timeLeft = timePerQuestion;
+            timerDisplay.textContent = timeLeft;
+            timerBar.style.width = '100%';
+            timer = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                timerBar.style.width = `${(timeLeft / timePerQuestion) * 100}%`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    selectedAnswers[currentIndex] = selectedAnswers[currentIndex] ?? null;
+                    nextQuestion();
+                }
+            }, 1000);
+        }
+
+        function nextQuestion() {
+            clearInterval(timer);
+            totalTime += (timePerQuestion - parseInt(timerDisplay.textContent));
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                loadQuestion(currentIndex);
+                startTimer();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            clearInterval(timer);
+            const correct = questions.filter((q, i) => selectedAnswers[i] === q.answer).length;
+            const incorrect = selectedAnswers.filter((a, i) => a !== null && a !== questions[i].answer).length;
+            const skipped = selectedAnswers.filter(a => a === null).length;
+
+            scoreValue.textContent = correct;
+            timeTaken.textContent = totalTime;
+            correctCount.textContent = correct;
+            incorrectCount.textContent = incorrect;
+            skippedCount.textContent = skipped;
+            avgTimePerQuestion.textContent = (totalTime / questions.length).toFixed(1);
+
+            saveToLeaderboard(playerNameInput.value, correct, totalTime);
+            switchScreen(resultsScreen);
+        }
+
+        function saveToLeaderboard(name, score, time) {
+            const data = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+            data.push({ name, score, time, date: new Date().toLocaleString() });
+            localStorage.setItem('leaderboard', JSON.stringify(data));
+            renderLeaderboard();
+        }
+
+        function renderLeaderboard() {
+            const data = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+            leaderboardBody.innerHTML = '';
+            data.forEach((entry, i) => {
+                const row = `<tr>
+                    <td class="py-2 px-4">${i + 1}</td>
+                    <td class="py-2 px-4">${entry.name}</td>
+                    <td class="py-2 px-4">${entry.score}</td>
+                    <td class="py-2 px-4">${entry.time}s</td>
+                    <td class="py-2 px-4">${entry.date}</td>
+                </tr>`;
+                leaderboardBody.innerHTML += row;
+            });
+        }
+
+        startBtn.onclick = () => {
+            questions = mockQuestions.slice(0, 10);
+            selectedAnswers = new Array(questions.length).fill(null);
+            currentIndex = 0;
+            totalTime = 0;
+            totalQuestions.textContent = questions.length;
+            loadQuestion(currentIndex);
+            startTimer();
+            switchScreen(quizScreen);
+        };
+
+        document.getElementById('nextBtn').onclick = nextQuestion;
+        document.getElementById('prevBtn').onclick = () => {
+            if (currentIndex > 0) {
+                clearInterval(timer);
+                currentIndex--;
+                loadQuestion(currentIndex);
+                startTimer();
+            }
+        };
+
+        homeBtn.onclick = () => switchScreen(startScreen);
+        leaderboardBtn.onclick = () => { renderLeaderboard(); switchScreen(leaderboardScreen); };
+        reviewBtn.onclick = () => {
+            reviewContainer.innerHTML = '';
+            questions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.innerHTML = `<h3 class="font-bold mb-2">${i + 1}. ${q.question}</h3>` +
+                    q.options.map((opt, j) => {
+                        const classes = ["p-2 border rounded mb-2"];
+                        if (j === q.answer) classes.push('correct');
+                        if (j === selectedAnswers[i] && j !== q.answer) classes.push('incorrect');
+                        return `<div class="${classes.join(' ')}">${opt}</div>`;
+                    }).join('');
+                reviewContainer.appendChild(div);
+            });
+            switchScreen(reviewScreen);
+        };
+
+        backToResultsBtn.onclick = () => switchScreen(resultsScreen);
+        backToHomeBtn.onclick = backFromAttemptsBtn.onclick = () => switchScreen(startScreen);
+        retakeBtn.onclick = () => switchScreen(startScreen);
+    </script>
+</body>
+
+</html>
