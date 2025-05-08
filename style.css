@@ -295,3 +295,8 @@ body {
         max-height: 300px !important;
     }
 }
+
+#tableContent,
+#cardContent {
+    white-space: nowrap;
+}
