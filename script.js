@@ -140,7 +140,7 @@ const cardData = async () => {
 
                     <div class="col-6 cardCasesBox">
                         <h6>Active Cases</h6>
-                        <div id="cardActiveCases">22123398</div>
+                        <div id="cardActiveCases">${value.active}</div>
                     </div>
                 </div>
 
@@ -162,6 +162,9 @@ cardContent.addEventListener("click", function () {
     tableIcon.style.display = "block";
     tableContent.style.display = "block";
 
+    searchInput.value = "";
+    sortCountry.value = "selectOption";
+
     localStorage.setItem("CurrentView", "table");
     tableView();
 
@@ -178,6 +181,9 @@ tableContent.addEventListener("click", function () {
     tableIcon.style.display = "none";
     tableContent.style.display = "none";
 
+    searchInput.value = "";
+    sortCountry.value = "selectOption";
+
     localStorage.setItem("CurrentView", "card");
     cardData();
 
@@ -192,13 +198,60 @@ searchInput.addEventListener("input", function () {
 
     let get = JSON.parse(localStorage.getItem("CountryData"))
 
-    tbody.innerHTML = "";
+    if (cardContent.style.display == "block") {
 
-    get.filter((value, index, array) => {
-        if (value["country name"].toLowerCase().includes(searchName)) {
+        cardView.innerHTML = "";
 
-            row = document.createElement("tr");
-            row.innerHTML = `
+        get.filter((value, index, array) => {
+            if (value["country name"].toLowerCase().includes(searchName)) {
+                let cardBox = document.createElement("div");
+
+                cardBox.classList.add("col-lg-3", "col-md-4", "col-sm-6", "col-12");
+
+                cardBox.innerHTML = `
+            <div class="card">
+                <div id="title" class="d-flex align-items-center gap-2">
+                    <img src="${value.flag}" id="logo"></img>
+                    <div id="countryName">${value["country name"]}</div>
+                </div>
+
+                <div class="row" id="data">
+                    <div class="col-6 cardCasesBox">
+                        <h6>Total Cases</h6>
+                        <div id="cardTotalCases">${value["Total cases"]}</div>
+                    </div>
+
+                    <div class="col-6 cardCasesBox">
+                        <h6>Deaths</h6>
+                        <div id="cardDeathCases">${value["Total Deaths"]}</div>
+                    </div>
+
+                    <div class="col-6 cardCasesBox">
+                        <h6>Total Recovered</h6>
+                        <div id="cardRecovered">${value["Recovered"]}</div>
+                    </div>
+
+                    <div class="col-6 cardCasesBox">
+                        <h6>Active Cases</h6>
+                        <div id="cardActiveCases">${value["Active"]}</div>
+                    </div>
+                </div>
+
+            </div>`;
+
+                cardView.append(cardBox);
+            }
+        });
+    }
+    else if (tableContent.style.display == "block") {
+
+        tbody.innerHTML = "";
+
+        get.filter((value, index, array) => {
+            if (value["country name"].toLowerCase().includes(searchName)) {
+
+                row = document.createElement("tr");
+                row.innerHTML = `
                         <td class="d-flex align-items-center gap-2">
                         <img src="${value.flag}" alt="" id="countryFlag">    
                         <div>${value["country name"]}</div>
@@ -207,13 +260,14 @@ searchInput.addEventListener("input", function () {
                         <td>${value["Today cases"]}</td>
                         <td>${value["Total Deaths"]}</td>
                         <td>${value["Today Deaths"]}</td>
-                        <td>${value["Recovered"]}</ >
+                        <td>${value["Recovered"]}</td>
                         <td>${value["Active"]}</td>
                         <td>${value["Critical"]}</td>`;
-            tbody.appendChild(row);
+                tbody.appendChild(row);
 
-        }
-    });
+            }
+        });
+    }
 });
 
 // On load - set default view
@@ -426,93 +480,55 @@ sortCountry.addEventListener("change", function () {
     let sortValue = sortCountry.value;
     let get = JSON.parse(localStorage.getItem("CountryData"));
 
-    tbody.innerHTML = "";
+    let currentView = tableContent.style.display === "block" ? "table" : "card";
 
-    if (sortValue == "sortByCases") {
+    if (sortValue === "sortByCases") {
         get.sort((a, b) => b["Total cases"] - a["Total cases"]);
-
-        get.forEach((value) => {
-            row = document.createElement("tr");
-            row.innerHTML = `
-                        <td class="d-flex align-items-center gap-2">
-                        <img src="${value.flag}" alt="" id="countryFlag">    
-                        <div>${value["country name"]}</div>
-                        </td>
-                        <td>${value["Total cases"]}</td>
-                        <td>${value["Today cases"]}</td>
-                        <td>${value["Total Deaths"]}</td>
-                        <td>${value["Today Deaths"]}</td>
-                        <td>${value["Recovered"]}</ >
-                        <td>${value["Active"]}</td>
-                        <td>${value["Critical"]}</td>`;
-            tbody.appendChild(row);
-
-        });
-    }
-    else if (sortValue == "sortByDeaths") {
+    } else if (sortValue === "sortByDeaths") {
         get.sort((a, b) => b["Total Deaths"] - a["Total Deaths"]);
-
-        get.forEach((value) => {
-            row = document.createElement("tr");
-            row.innerHTML = `
-                        <td class="d-flex align-items-center gap-2">
-                        <img src="${value.flag}" alt="" id="countryFlag">    
-                        <div>${value["country name"]}</div>
-                        </td>
-                        <td>${value["Total cases"]}</td>
-                        <td>${value["Today cases"]}</td>
-                        <td>${value["Total Deaths"]}</td>
-                        <td>${value["Today Deaths"]}</td>
-                        <td>${value["Recovered"]}</ >
-                        <td>${value["Active"]}</td>
-                        <td>${value["Critical"]}</td>`;
-            tbody.appendChild(row);
-
-        });
-    }
-    else if (sortValue == "sortByRecovered") {
+    } else if (sortValue === "sortByRecovered") {
         get.sort((a, b) => b["Recovered"] - a["Recovered"]);
-
-        get.forEach((value) => {
-            row = document.createElement("tr");
-            row.innerHTML = `
-                        <td class="d-flex align-items-center gap-2">
-                        <img src="${value.flag}" alt="" id="countryFlag">    
-                        <div>${value["country name"]}</div>
-                        </td>
-                        <td>${value["Total cases"]}</td>
-                        <td>${value["Today cases"]}</td>
-                        <td>${value["Total Deaths"]}</td>
-                        <td>${value["Today Deaths"]}</td>
-                        <td>${value["Recovered"]}</ >
-                        <td>${value["Active"]}</td>
-                        <td>${value["Critical"]}</td>`;
-            tbody.appendChild(row);
-
-        });
-    }
-    else if (sortValue == "sortByActive") {
+    } else if (sortValue === "sortByActive") {
         get.sort((a, b) => b["Active"] - a["Active"]);
-
-        get.forEach((value) => {
-            row = document.createElement("tr");
-            row.innerHTML = `
-                        <td class="d-flex align-items-center gap-2">
-                        <img src="${value.flag}" alt="" id="countryFlag">    
-                        <div>${value["country name"]}</div>
-                        </td>
-                        <td>${value["Total cases"]}</td>
-                        <td>${value["Today cases"]}</td>
-                        <td>${value["Total Deaths"]}</td>
-                        <td>${value["Today Deaths"]}</td>
-                        <td>${value["Recovered"]}</ >
-                        <td>${value["Active"]}</td>
-                        <td>${value["Critical"]}</td>`;
-            tbody.appendChild(row);
-
-        });
     }
-    else {
-        tableView();
+
+    if (currentView === "table") {
+        tbody.innerHTML = "";
+        get.forEach((value) => {
+            let row = document.createElement("tr");
+            row.innerHTML = `
+                <td class="d-flex align-items-center gap-2">
+                    <img src="${value.flag}" alt="" id="countryFlag">
+                    <div>${value["country name"]}</div>
+                </td>
+                <td>${value["Total cases"]}</td>
+                <td>${value["Today cases"]}</td>
+                <td>${value["Total Deaths"]}</td>
+                <td>${value["Today Deaths"]}</td>
+                <td>${value["Recovered"]}</td>
+                <td>${value["Active"]}</td>
+                <td>${value["Critical"]}</td>`;
+            tbody.appendChild(row);
+        });
+    } else {
+        cardView.innerHTML = "";
+        get.forEach((value) => {
+            let cardBox = document.createElement("div");
+            cardBox.classList.add("col-lg-3", "col-md-4", "col-sm-6", "col-12");
+            cardBox.innerHTML = `
+                <div class="card">
+                    <div id="title" class="d-flex align-items-center gap-2">
+                        <img src="${value.flag}" id="logo"></img>
+                        <div id="countryName">${value["country name"]}</div>
+                    </div>
+                    <div class="row" id="data">
+                        <div class="col-6 cardCasesBox"><h6>Total Cases</h6><div>${value["Total cases"]}</div></div>
+                        <div class="col-6 cardCasesBox"><h6>Deaths</h6><div>${value["Total Deaths"]}</div></div>
+                        <div class="col-6 cardCasesBox"><h6>Total Recovered</h6><div>${value["Recovered"]}</div></div>
+                        <div class="col-6 cardCasesBox"><h6>Active Cases</h6><div>${value["Active"]}</div></div>
+                    </div>
+                </div>`;
+            cardView.appendChild(cardBox);
+        });
     }
 });
