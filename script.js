@@ -426,24 +426,93 @@ sortCountry.addEventListener("change", function () {
     let sortValue = sortCountry.value;
     let get = JSON.parse(localStorage.getItem("CountryData"));
 
-    get.filter((value, index, array) => {
-        console.log(value);
-    });
+    tbody.innerHTML = "";
 
     if (sortValue == "sortByCases") {
-        console.log("sortByCases");
+        get.sort((a, b) => b["Total cases"] - a["Total cases"]);
+
+        get.forEach((value) => {
+            row = document.createElement("tr");
+            row.innerHTML = `
+                        <td class="d-flex align-items-center gap-2">
+                        <img src="${value.flag}" alt="" id="countryFlag">    
+                        <div>${value["country name"]}</div>
+                        </td>
+                        <td>${value["Total cases"]}</td>
+                        <td>${value["Today cases"]}</td>
+                        <td>${value["Total Deaths"]}</td>
+                        <td>${value["Today Deaths"]}</td>
+                        <td>${value["Recovered"]}</ >
+                        <td>${value["Active"]}</td>
+                        <td>${value["Critical"]}</td>`;
+            tbody.appendChild(row);
+
+        });
     }
     else if (sortValue == "sortByDeaths") {
-        console.log("sortByDeaths");
+        get.sort((a, b) => b["Total Deaths"] - a["Total Deaths"]);
+
+        get.forEach((value) => {
+            row = document.createElement("tr");
+            row.innerHTML = `
+                        <td class="d-flex align-items-center gap-2">
+                        <img src="${value.flag}" alt="" id="countryFlag">    
+                        <div>${value["country name"]}</div>
+                        </td>
+                        <td>${value["Total cases"]}</td>
+                        <td>${value["Today cases"]}</td>
+                        <td>${value["Total Deaths"]}</td>
+                        <td>${value["Today Deaths"]}</td>
+                        <td>${value["Recovered"]}</ >
+                        <td>${value["Active"]}</td>
+                        <td>${value["Critical"]}</td>`;
+            tbody.appendChild(row);
+
+        });
     }
     else if (sortValue == "sortByRecovered") {
-        console.log("sortByRecovered");
+        get.sort((a, b) => b["Recovered"] - a["Recovered"]);
+
+        get.forEach((value) => {
+            row = document.createElement("tr");
+            row.innerHTML = `
+                        <td class="d-flex align-items-center gap-2">
+                        <img src="${value.flag}" alt="" id="countryFlag">    
+                        <div>${value["country name"]}</div>
+                        </td>
+                        <td>${value["Total cases"]}</td>
+                        <td>${value["Today cases"]}</td>
+                        <td>${value["Total Deaths"]}</td>
+                        <td>${value["Today Deaths"]}</td>
+                        <td>${value["Recovered"]}</ >
+                        <td>${value["Active"]}</td>
+                        <td>${value["Critical"]}</td>`;
+            tbody.appendChild(row);
+
+        });
     }
     else if (sortValue == "sortByActive") {
-        console.log("sortByActive");
+        get.sort((a, b) => b["Active"] - a["Active"]);
+
+        get.forEach((value) => {
+            row = document.createElement("tr");
+            row.innerHTML = `
+                        <td class="d-flex align-items-center gap-2">
+                        <img src="${value.flag}" alt="" id="countryFlag">    
+                        <div>${value["country name"]}</div>
+                        </td>
+                        <td>${value["Total cases"]}</td>
+                        <td>${value["Today cases"]}</td>
+                        <td>${value["Total Deaths"]}</td>
+                        <td>${value["Today Deaths"]}</td>
+                        <td>${value["Recovered"]}</ >
+                        <td>${value["Active"]}</td>
+                        <td>${value["Critical"]}</td>`;
+            tbody.appendChild(row);
+
+        });
     }
-    else if (sortValue == "selectOption") {
-        console.log("selectOption");
+    else {
+        tableView();
     }
 });
-
